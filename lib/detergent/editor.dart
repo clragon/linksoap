@@ -106,6 +106,14 @@ class _DetergentEditorScreenState extends State<DetergentEditorScreen> {
             shrinkWrap: true,
             children: [
               const Icon(Icons.cleaning_services, size: 48),
+              const SizedBox(height: 16),
+              Text(
+                'Removes matching query parameters',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 24),
               TextFormField(
                 controller: _nameController,
