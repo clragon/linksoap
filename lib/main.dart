@@ -17,9 +17,12 @@ Future<void> main(List<String> arguments) async {
 
   storage = await Storage.init();
 
-  await setupWindow(visible: storage.isWindowVisible());
+  await setupWindow(
+    visible: storage.isWindowVisible(),
+    onVisibilityChange: (visible) => storage.setWindowVisible(visible),
+  );
 
-  await setupSystemTray(storage);
+  await setupSystemTray();
 
   await ClipboardManager.instance.init();
 

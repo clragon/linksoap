@@ -1,10 +1,9 @@
 import 'dart:io';
 
-import 'package:linksoap/core/storage.dart';
 import 'package:system_tray/system_tray.dart';
 import 'package:window_manager/window_manager.dart';
 
-Future<void> setupSystemTray(Storage storage) async {
+Future<void> setupSystemTray() async {
   WindowManager windowManager = WindowManager.instance;
   await windowManager.ensureInitialized();
 
@@ -21,10 +20,7 @@ Future<void> setupSystemTray(Storage storage) async {
     [
       MenuItemLabel(
         label: 'Hide',
-        onClicked: (item) async {
-          await windowManager.hide();
-          await storage.setWindowVisible(false);
-        },
+        onClicked: (item) => windowManager.hide(),
       ),
       MenuItemLabel(
         label: 'Exit',
@@ -41,7 +37,6 @@ Future<void> setupSystemTray(Storage storage) async {
   tray.registerSystemTrayEventHandler((event) async {
     if (event == kSystemTrayEventClick) {
       await windowManager.show();
-      await storage.setWindowVisible(true);
     }
     if (event == kSystemTrayEventRightClick) {
       tray.popUpContextMenu();
