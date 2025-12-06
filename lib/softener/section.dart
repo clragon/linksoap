@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:linksoap/core/desktop_dialog.dart';
 import 'package:linksoap/core/storage.dart';
 import 'package:linksoap/softener/model.dart';
 import 'package:linksoap/softener/editor.dart';
@@ -36,8 +37,11 @@ class SoftenersSection extends StatelessWidget {
                 onPressed: () async {
                   final result = await Navigator.push<Softener>(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const SoftenerEditorScreen(),
+                    DialogRoute(
+                      context: context,
+                      builder: (context) =>
+                          DesktopDialog(child: const SoftenerEditorScreen()),
+                      fullscreenDialog: true,
                     ),
                   );
                   if (result != null) {
@@ -212,8 +216,11 @@ class SoftenersSection extends StatelessWidget {
           onTap: () async {
             final result = await Navigator.push<Softener>(
               context,
-              MaterialPageRoute(
-                builder: (context) => SoftenerEditorScreen(softener: softener),
+              DialogRoute(
+                context: context,
+                builder: (context) => DesktopDialog(
+                    child: SoftenerEditorScreen(softener: softener)),
+                fullscreenDialog: true,
               ),
             );
             if (result != null) {

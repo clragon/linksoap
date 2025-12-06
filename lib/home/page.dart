@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:linksoap/core/clipboard.dart';
+import 'package:linksoap/core/desktop_dialog.dart';
 import 'package:linksoap/core/storage.dart';
 import 'package:linksoap/detergent/model.dart';
 import 'package:linksoap/detergent/section.dart';
@@ -96,17 +97,19 @@ class _HomePageState extends State<HomePage> {
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       const Spacer(),
-                      IconButton(
+                      TextButton.icon(
+                        iconAlignment: IconAlignment.end,
                         icon: const Icon(Icons.chevron_right),
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SettingsScreen(),
-                            ),
-                          );
-                        },
+                        label: const Text('Open'),
+                        onPressed: () => Navigator.push(
+                          context,
+                          DialogRoute(
+                            context: context,
+                            builder: (context) =>
+                                DesktopDialog(child: const SettingsScreen()),
+                            fullscreenDialog: true,
+                          ),
+                        ),
                       ),
                     ],
                   ),

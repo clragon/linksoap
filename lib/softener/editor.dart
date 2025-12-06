@@ -89,153 +89,151 @@ class _SoftenerEditorScreenState extends State<SoftenerEditorScreen> {
       appBar: AppBar(
         title: Text(widget.softener == null ? 'New Softener' : 'Edit Softener'),
         actions: [
-          TextButton(
-            onPressed: _save,
-            child: const Text('Save'),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: TextButton(
+              onPressed: _save,
+              child: const Text('Save'),
+            ),
           ),
         ],
       ),
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 800),
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                const Icon(Icons.auto_fix_high, size: 48),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Name',
-                    hintText: 'e.g., Fix Twitter',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Name is required';
-                    }
-                    return null;
-                  },
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              const Icon(Icons.auto_fix_high, size: 48),
+              const SizedBox(height: 24),
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'e.g., Fix Twitter',
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _domainController,
-                  decoration: const InputDecoration(
-                    labelText: 'Domain Pattern (regex)',
-                    hintText: r'e.g., twitter\.com|x\.com',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Domain pattern is required';
-                    }
-                    try {
-                      RegExp(value.trim());
-                    } catch (e) {
-                      return 'Invalid regex pattern';
-                    }
-                    return null;
-                  },
-                  onChanged: (_) => _testSoftener(),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Name is required';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _domainController,
+                decoration: const InputDecoration(
+                  labelText: 'Domain Pattern (regex)',
+                  hintText: r'e.g., twitter\.com|x\.com',
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _replacementController,
-                  decoration: const InputDecoration(
-                    labelText: 'Replacement',
-                    hintText: 'e.g., fxtwitter.com',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Replacement is required';
-                    }
-                    return null;
-                  },
-                  onChanged: (_) => _testSoftener(),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Domain pattern is required';
+                  }
+                  try {
+                    RegExp(value.trim());
+                  } catch (e) {
+                    return 'Invalid regex pattern';
+                  }
+                  return null;
+                },
+                onChanged: (_) => _testSoftener(),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _replacementController,
+                decoration: const InputDecoration(
+                  labelText: 'Replacement',
+                  hintText: 'e.g., fxtwitter.com',
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(height: 32),
-                Text(
-                  'Test',
-                  style: Theme.of(context).textTheme.titleLarge,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Replacement is required';
+                  }
+                  return null;
+                },
+                onChanged: (_) => _testSoftener(),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                'Test',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _testUrlController,
+                decoration: InputDecoration(
+                  labelText: 'Test URL',
+                  hintText: 'https://twitter.com/user/status/123',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: _testUrlController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            setState(() {
+                              _testUrlController.clear();
+                              _testResult = '';
+                              _errorMessage = null;
+                            });
+                          },
+                        )
+                      : null,
                 ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _testUrlController,
-                  decoration: InputDecoration(
-                    labelText: 'Test URL',
-                    hintText: 'https://twitter.com/user/status/123',
-                    border: const OutlineInputBorder(),
-                    suffixIcon: _testUrlController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              setState(() {
-                                _testUrlController.clear();
-                                _testResult = '';
-                                _errorMessage = null;
-                              });
-                            },
-                          )
-                        : null,
-                  ),
-                  onChanged: (_) => _testSoftener(),
-                ),
-                const SizedBox(height: 16),
-                if (_errorMessage != null)
-                  Card(
-                    color: Theme.of(context).colorScheme.errorContainer,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        _errorMessage!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onErrorContainer,
-                        ),
+                onChanged: (_) => _testSoftener(),
+              ),
+              const SizedBox(height: 16),
+              if (_errorMessage != null)
+                Card(
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      _errorMessage!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onErrorContainer,
                       ),
                     ),
                   ),
-                if (_testResult.isNotEmpty)
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                'Result:',
-                                style: Theme.of(context).textTheme.titleSmall,
-                              ),
-                              if (_testResult != _testUrlController.text) ...[
-                                const SizedBox(width: 8),
-                                const Icon(Icons.check_circle,
-                                    color: Colors.green, size: 20),
-                              ],
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _testResult,
-                            style: TextStyle(
-                              fontFamily: 'monospace',
-                              color: _testResult == _testUrlController.text
-                                  ? Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant
-                                  : Theme.of(context).colorScheme.primary,
+                ),
+              if (_testResult.isNotEmpty)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Result:',
+                              style: Theme.of(context).textTheme.titleSmall,
                             ),
+                            if (_testResult != _testUrlController.text) ...[
+                              const SizedBox(width: 8),
+                              const Icon(Icons.check_circle,
+                                  color: Colors.green, size: 20),
+                            ],
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _testResult,
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            color: _testResult == _testUrlController.text
+                                ? Theme.of(context).colorScheme.onSurfaceVariant
+                                : Theme.of(context).colorScheme.primary,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:linksoap/core/desktop_dialog.dart';
 import 'package:linksoap/core/storage.dart';
 import 'package:linksoap/detergent/model.dart';
 import 'package:linksoap/detergent/editor.dart';
@@ -36,8 +37,11 @@ class DetergentsSection extends StatelessWidget {
                 onPressed: () async {
                   final result = await Navigator.push<Detergent>(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const DetergentEditorScreen(),
+                    DialogRoute(
+                      context: context,
+                      builder: (context) =>
+                          DesktopDialog(child: const DetergentEditorScreen()),
+                      fullscreenDialog: true,
                     ),
                   );
                   if (result != null) {
@@ -214,9 +218,11 @@ class DetergentsSection extends StatelessWidget {
           onTap: () async {
             final result = await Navigator.push<Detergent>(
               context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    DetergentEditorScreen(detergent: detergent),
+              DialogRoute(
+                context: context,
+                builder: (context) => DesktopDialog(
+                    child: DetergentEditorScreen(detergent: detergent)),
+                fullscreenDialog: true,
               ),
             );
             if (result != null) {
