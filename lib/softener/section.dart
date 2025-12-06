@@ -57,7 +57,9 @@ class SoftenersSection extends StatelessWidget {
         SliverToBoxAdapter(
           child: Text(
             'Hostname replacements',
-            style: Theme.of(context).textTheme.bodySmall,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
         ),
         const SliverToBoxAdapter(child: SizedBox(height: 8)),

@@ -106,14 +106,18 @@ class HistorySection extends StatelessWidget {
           SliverToBoxAdapter(
             child: Text(
               'Nothing here yet! Copy some links to see the magic work!',
-              style: Theme.of(context).textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
           ),
         if (historyEnabled && history.isNotEmpty)
           SliverToBoxAdapter(
             child: Text(
               'Your latest scrubbed links',
-              style: Theme.of(context).textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
           ),
         const SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -151,7 +155,9 @@ class HistorySection extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               child: Text(
                 '... and ${history.length - 10} more',
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
             ),
           ),
