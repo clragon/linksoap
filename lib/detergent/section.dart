@@ -208,9 +208,17 @@ class DetergentsSection extends StatelessWidget {
           },
           child: Row(
             children: [
-              Icon(detergent.enabled ? Icons.pause : Icons.play_arrow),
+              Icon(
+                detergent.enabled ? Icons.pause : Icons.play_arrow,
+                color: detergent.enabled ? Colors.orange : Colors.green,
+              ),
               const SizedBox(width: 12),
-              Text(detergent.enabled ? 'Disable' : 'Enable'),
+              Text(
+                detergent.enabled ? 'Disable' : 'Enable',
+                style: TextStyle(
+                  color: detergent.enabled ? Colors.orange : Colors.green,
+                ),
+              ),
             ],
           ),
         ),

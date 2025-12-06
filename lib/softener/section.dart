@@ -206,9 +206,17 @@ class SoftenersSection extends StatelessWidget {
           },
           child: Row(
             children: [
-              Icon(softener.enabled ? Icons.pause : Icons.play_arrow),
+              Icon(
+                softener.enabled ? Icons.pause : Icons.play_arrow,
+                color: softener.enabled ? Colors.orange : Colors.green,
+              ),
               const SizedBox(width: 12),
-              Text(softener.enabled ? 'Disable' : 'Enable'),
+              Text(
+                softener.enabled ? 'Disable' : 'Enable',
+                style: TextStyle(
+                  color: softener.enabled ? Colors.orange : Colors.green,
+                ),
+              ),
             ],
           ),
         ),
