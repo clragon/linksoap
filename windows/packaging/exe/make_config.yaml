@@ -1,0 +1,9 @@
+# fastforge package --platform=windows --targets=exe --skip-clean
+app_id: 067f5bd1-29aa-444e-9b46-78120639b0a2
+display_name: LinkSoap
+publisher: clragon
+publisher_url: https://github.com/clragon/linksoap
+privileges_required: lowest
+setup_icon_file: windows\runner\resources\app_icon.ico
+locales:
+  - en

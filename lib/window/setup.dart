@@ -1,4 +1,16 @@
 import 'package:window_manager/window_manager.dart';
+import 'package:windows_single_instance/windows_single_instance.dart';
+
+const String _kSingleInstanceIdentifier =
+    "linksoap_067f5bd1_29aa_444e_9b46_78120639b0a2";
+
+Future<void> ensureSingleInstance(List<String> arguments) async {
+  await WindowsSingleInstance.ensureSingleInstance(
+      arguments, _kSingleInstanceIdentifier, onSecondWindow: (args) async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+}
 
 Future<void> setupWindow({
   required bool visible,

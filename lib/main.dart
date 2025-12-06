@@ -13,6 +13,8 @@ late Storage storage;
 Future<void> main(List<String> arguments) async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await ensureSingleInstance(arguments);
+
   setupLogging();
 
   storage = await Storage.init();
