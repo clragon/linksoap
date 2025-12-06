@@ -1,9 +1,11 @@
 import 'dart:io';
-
+import 'package:linksoap/window/platform.dart';
 import 'package:system_tray/system_tray.dart';
 import 'package:window_manager/window_manager.dart';
 
 Future<void> setupSystemTray() async {
+  if (!isDesktop()) return;
+
   WindowManager windowManager = WindowManager.instance;
   await windowManager.ensureInitialized();
 

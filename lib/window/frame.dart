@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linksoap/window/platform.dart';
 import 'package:window_manager/window_manager.dart';
 
 class WindowFrame extends StatefulWidget {
@@ -14,15 +15,19 @@ class _WindowFrameState extends State<WindowFrame> with WindowListener {
   bool isFullscreen = false;
   bool isFocused = false;
   bool isMaximized = false;
+  final bool desktop = isDesktop();
 
   @override
   void initState() {
     super.initState();
-    windowManager.addListener(this);
-    _checkWindowState();
+    if (desktop) {
+      windowManager.addListener(this);
+      _checkWindowState();
+    }
   }
 
   Future<void> _checkWindowState() async {
+    if (!desktop) return;
     isFullscreen = await windowManager.isFullScreen();
     isFocused = await windowManager.isFocused();
     isMaximized = await windowManager.isMaximized();
@@ -31,7 +36,9 @@ class _WindowFrameState extends State<WindowFrame> with WindowListener {
 
   @override
   void dispose() {
-    windowManager.removeListener(this);
+    if (desktop) {
+      windowManager.removeListener(this);
+    }
     super.dispose();
   }
 
@@ -58,6 +65,10 @@ class _WindowFrameState extends State<WindowFrame> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    if (!desktop) {
+      return widget.child;
+    }
+
     return Column(
       children: [
         if (!isFullscreen)
