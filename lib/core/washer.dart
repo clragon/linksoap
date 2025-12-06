@@ -39,7 +39,7 @@ class Washer {
       if (!softener.enabled) continue;
       final pattern = RegExp(softener.domain);
       if (pattern.hasMatch(uri.host)) {
-        final newHost = uri.host.replaceFirst(pattern, softener.replacement);
+        final newHost = softener.replacement;
         _log.fine(
             'Applying softener: ${softener.name} (${uri.host} -> $newHost)');
         uri = uri.replace(host: newHost);
