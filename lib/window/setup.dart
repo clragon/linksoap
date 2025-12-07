@@ -1,16 +1,32 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:linksoap/window/platform.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
 
-const String _kSingleInstanceIdentifier =
+const String _kSingleInstanceBaseIdentifier =
     "linksoap_067f5bd1_29aa_444e_9b46_78120639b0a2";
+
+String _buildMode() {
+  if (kReleaseMode) return 'release';
+  if (kProfileMode) return 'profile';
+  return 'debug';
+}
+
+Future<String> _getSingleInstanceIdentifier() async {
+  final packageInfo = await PackageInfo.fromPlatform();
+  final mode = _buildMode();
+  final version = packageInfo.version;
+  return '${_kSingleInstanceBaseIdentifier}_${mode}_$version';
+}
 
 Future<void> ensureSingleInstance(List<String> arguments) async {
   if (!Platform.isWindows) return;
 
-  await WindowsSingleInstance.ensureSingleInstance(
-      arguments, _kSingleInstanceIdentifier, onSecondWindow: (args) async {
+  final identifier = await _getSingleInstanceIdentifier();
+  await WindowsSingleInstance.ensureSingleInstance(arguments, identifier,
+      onSecondWindow: (args) async {
     await windowManager.show();
     await windowManager.focus();
   });
