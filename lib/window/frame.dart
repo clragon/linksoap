@@ -95,7 +95,7 @@ class _WindowFrameState extends State<WindowFrame> with WindowListener {
                             right: 8,
                           ),
                           child: Image.asset(
-                            'assets/icon.png',
+                            'assets/icon/icon.png',
                             width: 18,
                             height: 18,
                           ),

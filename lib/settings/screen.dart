@@ -38,7 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             shrinkWrap: true,
             children: [
               const SizedBox(height: 24),
-              Image.asset('assets/icon.png', width: 72, height: 72),
+              Image.asset('assets/icon/icon.png', width: 72, height: 72),
               const SizedBox(height: 16),
               Text(
                 _packageInfo?.appName ?? 'LinkSoap',

@@ -33,17 +33,17 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/icon.png
-    - assets/icon.ico
-    - assets/bg.png
-    - assets/fg.png
+    - assets/icon/icon.png
+    - assets/icon/icon.ico
+    - assets/icon/bg.png
+    - assets/icon/fg.png
 
 # dart run flutter_launcher_icons
 flutter_launcher_icons:
-  image_path: "assets/icon.png"
+  image_path: "assets/icon/icon.png"
   android:
-    adaptive_icon_background: "assets/bg.png"
-    adaptive_icon_foreground: "assets/fg.png"
+    adaptive_icon_background: "assets/icon/bg.png"
+    adaptive_icon_foreground: "assets/icon/fg.png"
   windows:
     generate: true
-    image_path: "assets/icon.ico"
+    image_path: "assets/icon/icon.ico"

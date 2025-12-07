@@ -9,7 +9,8 @@ Future<void> setupSystemTray() async {
   WindowManager windowManager = WindowManager.instance;
   await windowManager.ensureInitialized();
 
-  String iconPath = Platform.isWindows ? 'assets/icon.ico' : 'assets/icon.png';
+  String iconPath =
+      Platform.isWindows ? 'assets/icon/icon.ico' : 'assets/icon/icon.png';
 
   SystemTray tray = SystemTray();
   await tray.initSystemTray(
