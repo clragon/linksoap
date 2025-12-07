@@ -100,12 +100,13 @@ class ShareActivity : Activity() {
     
     private fun invokeMethod(engine: FlutterEngine, text: String) {
         MethodChannel(engine.dartExecutor.binaryMessenger, ShareConstants.CHANNEL_NAME)
-            .invokeMethod(ShareConstants.METHOD_PROCESS_TEXT, text, createResultHandler())
+            .invokeMethod(ShareConstants.METHOD_PROCESS_TEXT, text, createResultHandler(text))
     }
     
-    private fun createResultHandler() = object : MethodChannel.Result {
+    private fun createResultHandler(originalText: String) = object : MethodChannel.Result {
         override fun success(result: Any?) {
-            (result as? String)?.let { setClipboard(it) }
+            val cleanedText = (result as? String)?.takeIf { it.isNotEmpty() } ?: originalText
+            setClipboard(cleanedText)
             finishSafely()
         }
         
