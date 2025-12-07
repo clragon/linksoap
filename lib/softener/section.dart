@@ -35,14 +35,9 @@ class SoftenersSection extends StatelessWidget {
                 icon: const Icon(Icons.add),
                 visualDensity: VisualDensity.compact,
                 onPressed: () async {
-                  final result = await Navigator.push<Softener>(
-                    context,
-                    DialogRoute(
-                      context: context,
-                      builder: (context) =>
-                          DesktopDialog(child: const SoftenerEditorScreen()),
-                      fullscreenDialog: true,
-                    ),
+                  final result = await showDesktopDialog<Softener>(
+                    context: context,
+                    child: const SoftenerEditorScreen(),
                   );
                   if (result != null) {
                     softeners.add(result);
@@ -224,14 +219,9 @@ class SoftenersSection extends StatelessWidget {
         ),
         PopupMenuItem(
           onTap: () async {
-            final result = await Navigator.push<Softener>(
-              context,
-              DialogRoute(
-                context: context,
-                builder: (context) => DesktopDialog(
-                    child: SoftenerEditorScreen(softener: softener)),
-                fullscreenDialog: true,
-              ),
+            final result = await showDesktopDialog<Softener>(
+              context: context,
+              child: SoftenerEditorScreen(softener: softener),
             );
             if (result != null) {
               final updated =

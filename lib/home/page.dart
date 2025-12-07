@@ -101,14 +101,9 @@ class _HomePageState extends State<HomePage> {
                         iconAlignment: IconAlignment.end,
                         icon: const Icon(Icons.chevron_right),
                         label: const Text('Open'),
-                        onPressed: () => Navigator.push(
-                          context,
-                          DialogRoute(
-                            context: context,
-                            builder: (context) =>
-                                DesktopDialog(child: const SettingsScreen()),
-                            fullscreenDialog: true,
-                          ),
+                        onPressed: () => showDesktopDialog(
+                          context: context,
+                          child: const SettingsScreen(),
                         ),
                       ),
                     ],

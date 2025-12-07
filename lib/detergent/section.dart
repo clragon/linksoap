@@ -35,14 +35,9 @@ class DetergentsSection extends StatelessWidget {
                 icon: const Icon(Icons.add),
                 visualDensity: VisualDensity.compact,
                 onPressed: () async {
-                  final result = await Navigator.push<Detergent>(
-                    context,
-                    DialogRoute(
-                      context: context,
-                      builder: (context) =>
-                          DesktopDialog(child: const DetergentEditorScreen()),
-                      fullscreenDialog: true,
-                    ),
+                  final result = await showDesktopDialog<Detergent>(
+                    context: context,
+                    child: const DetergentEditorScreen(),
                   );
                   if (result != null) {
                     detergents.add(result);
@@ -226,14 +221,9 @@ class DetergentsSection extends StatelessWidget {
         ),
         PopupMenuItem(
           onTap: () async {
-            final result = await Navigator.push<Detergent>(
-              context,
-              DialogRoute(
-                context: context,
-                builder: (context) => DesktopDialog(
-                    child: DetergentEditorScreen(detergent: detergent)),
-                fullscreenDialog: true,
-              ),
+            final result = await showDesktopDialog<Detergent>(
+              context: context,
+              child: DetergentEditorScreen(detergent: detergent),
             );
             if (result != null) {
               final updated =
