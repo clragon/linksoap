@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:linksoap/core/clipboard.dart';
+import 'package:linksoap/core/laundromat.dart';
 import 'package:linksoap/core/desktop_dialog.dart';
 import 'package:linksoap/core/storage.dart';
 import 'package:linksoap/detergent/model.dart';
@@ -32,12 +32,12 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _loadData();
-    ClipboardManager.instance.addListener(_loadData);
+    Laundromat.instance.addListener(_loadData);
   }
 
   @override
   void dispose() {
-    ClipboardManager.instance.removeListener(_loadData);
+    Laundromat.instance.removeListener(_loadData);
     super.dispose();
   }
 

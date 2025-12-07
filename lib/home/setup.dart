@@ -1,6 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:linksoap/core/laundromat.dart';
 
 class SetupSection extends StatefulWidget {
   const SetupSection({super.key});
@@ -15,20 +14,13 @@ class _SetupSectionState extends State<SetupSection> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) {
-      _checkSetupBoot();
-    }
+    _checkSetupBoot();
   }
 
   Future<void> _checkSetupBoot() async {
-    try {
-      const channel = MethodChannel('net.clynamic.linksoap/share');
-      final isSetupBoot = await channel.invokeMethod<bool>('isSetupBoot');
-      if (isSetupBoot == true && mounted) {
-        setState(() => showSetupBoot = true);
-      }
-    } catch (e) {
-      // Ignore if method not available
+    final isSetupBoot = await Laundromat.instance.isSetupBoot();
+    if (isSetupBoot && mounted) {
+      setState(() => showSetupBoot = true);
     }
   }
 
@@ -42,6 +34,7 @@ class _SetupSectionState extends State<SetupSection> {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 16),
         child: Card(
+          margin: const EdgeInsets.all(0),
           color: Theme.of(context).colorScheme.primaryContainer,
           child: Padding(
             padding: const EdgeInsets.all(16.0),

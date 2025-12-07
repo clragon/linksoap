@@ -13,15 +13,15 @@ object SharePlugin {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, ShareConstants.CHANNEL_NAME)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
-                    ShareConstants.METHOD_REGISTER_HANDLE -> {
-                        val handle = call.arguments as? Long ?: run {
-                            result.error("INVALID_ARG", "Handle must be Long", null)
-                            return@setMethodCallHandler
+                    ShareConstants.METHOD_SETUP_NATIVE -> {
+                        val args = call.arguments as? Map<*, *>
+                        val handle = args?.get("callbackHandle") as? Long
+                        if (handle != null) {
+                            context.getSharedPreferences(ShareConstants.PREFS_NAME, Context.MODE_PRIVATE)
+                                .edit()
+                                .putLong(ShareConstants.CALLBACK_HANDLE_KEY, handle)
+                                .apply()
                         }
-                        context.getSharedPreferences(ShareConstants.PREFS_NAME, Context.MODE_PRIVATE)
-                            .edit()
-                            .putLong(ShareConstants.CALLBACK_HANDLE_KEY, handle)
-                            .apply()
                         result.success(null)
                     }
                     ShareConstants.METHOD_IS_SETUP_BOOT -> {

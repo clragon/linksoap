@@ -74,10 +74,10 @@ namespace
   {
     std::string clipboard_content = GetClipboardText();
     auto args = std::make_unique<flutter::EncodableValue>(clipboard_content);
-    channel->InvokeMethod("onClipboardChanged", std::move(args), nullptr);
+    channel->InvokeMethod("processText", std::move(args), nullptr);
   }
 
-  void InitClipboardListener(
+  void SetupNativeChannel(
       const flutter::MethodCall<flutter::EncodableValue> &method_call,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -90,7 +90,7 @@ void ClipboardManagerPlugin::RegisterWithRegistrar(
     flutter::PluginRegistrarWindows *registrar)
 {
   channel = std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
-      registrar->messenger(), "clipboard_manager",
+      registrar->messenger(), "net.clynamic.linksoap/laundromat",
       &flutter::StandardMethodCodec::GetInstance());
 
   auto plugin = std::make_unique<ClipboardManagerPlugin>();
@@ -98,9 +98,9 @@ void ClipboardManagerPlugin::RegisterWithRegistrar(
   channel->SetMethodCallHandler(
       [plugin_pointer = plugin.get()](const auto &call, auto result)
       {
-        if (call.method_name().compare("initClipboardListener") == 0)
+        if (call.method_name().compare("setupNativeChannel") == 0)
         {
-          InitClipboardListener(call, std::move(result));
+          SetupNativeChannel(call, std::move(result));
         }
         else
         {
