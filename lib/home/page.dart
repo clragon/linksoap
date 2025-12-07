@@ -5,6 +5,7 @@ import 'package:linksoap/core/storage.dart';
 import 'package:linksoap/detergent/model.dart';
 import 'package:linksoap/detergent/section.dart';
 import 'package:linksoap/history/section.dart';
+import 'package:linksoap/home/setup.dart';
 import 'package:linksoap/home/tutorial.dart';
 import 'package:linksoap/home/stats.dart';
 import 'package:linksoap/settings/screen.dart';
@@ -66,6 +67,7 @@ class _HomePageState extends State<HomePage> {
               slivers: [
                 StatsSection(cleanedCount: cleanedCount),
                 const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                const SetupSection(),
                 TutorialSection(storage: widget.storage),
                 const SliverToBoxAdapter(child: SizedBox(height: 24)),
                 SoftenersSection(

@@ -14,18 +14,15 @@ import io.flutter.FlutterInjector
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.embedding.engine.dart.DartExecutor
-import io.flutter.embedding.engine.loader.FlutterLoader
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.view.FlutterCallbackInformation
 
 class ShareActivity : Activity() {
     companion object {
         private var backgroundEngine: FlutterEngine? = null
-        private const val TIMEOUT_MS = 10000L // 10 second timeout
     }
     
     private var timeoutHandler: Handler? = null
-    private var timeoutRunnable: Runnable? = null
     private var isFinishing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,19 +67,18 @@ class ShareActivity : Activity() {
     }
     
     private fun startTimeout() {
-        timeoutHandler = Handler(Looper.getMainLooper())
-        timeoutRunnable = Runnable {
-            Log.e("ShareActivity", "Processing timed out after ${TIMEOUT_MS}ms")
-            Toast.makeText(this, "Link processing timed out", Toast.LENGTH_SHORT).show()
-            finishSafely()
+        timeoutHandler = Handler(Looper.getMainLooper()).apply {
+            postDelayed({
+                Log.e("ShareActivity", "Processing timed out")
+                Toast.makeText(this@ShareActivity, "Link processing timed out", Toast.LENGTH_SHORT).show()
+                finishSafely()
+            }, ShareConstants.TIMEOUT_MS)
         }
-        timeoutHandler?.postDelayed(timeoutRunnable!!, TIMEOUT_MS)
     }
     
     private fun cancelTimeout() {
-        timeoutRunnable?.let { timeoutHandler?.removeCallbacks(it) }
+        timeoutHandler?.removeCallbacksAndMessages(null)
         timeoutHandler = null
-        timeoutRunnable = null
     }
     
     private fun finishSafely() {
@@ -94,37 +90,34 @@ class ShareActivity : Activity() {
     }
 
     private fun processShare(sharedText: String) {
-        val flutterEngine = FlutterEngineCache.getInstance().get("main")
-
-        if (flutterEngine != null) {
-            // App is running, use existing engine
-            val channel = MethodChannel(
-                flutterEngine.dartExecutor.binaryMessenger,
-                "net.clynamic.linksoap/share"
-            )
-            channel.invokeMethod("processSharedText", sharedText, object : MethodChannel.Result {
-                override fun success(result: Any?) {
-                    val cleanedText = result as? String
-                    if (cleanedText != null) {
-                        setClipboard(cleanedText)
-                    }
-                    finishSafely()
-                }
-                
-                override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
-                    Log.e("ShareActivity", "Share processing failed: $errorCode - $errorMessage")
-                    Toast.makeText(this@ShareActivity, "Failed to process link", Toast.LENGTH_SHORT).show()
-                    finishSafely()
-                }
-                
-                override fun notImplemented() {
-                    Log.e("ShareActivity", "Share processing not implemented")
-                    finishSafely()
-                }
-            })
+        val engine = FlutterEngineCache.getInstance().get(ShareConstants.ENGINE_ID)
+        if (engine != null) {
+            invokeMethod(engine, sharedText)
         } else {
-            // App is not running - create background engine
             startBackgroundEngine(sharedText)
+        }
+    }
+    
+    private fun invokeMethod(engine: FlutterEngine, text: String) {
+        MethodChannel(engine.dartExecutor.binaryMessenger, ShareConstants.CHANNEL_NAME)
+            .invokeMethod(ShareConstants.METHOD_PROCESS_TEXT, text, createResultHandler())
+    }
+    
+    private fun createResultHandler() = object : MethodChannel.Result {
+        override fun success(result: Any?) {
+            (result as? String)?.let { setClipboard(it) }
+            finishSafely()
+        }
+        
+        override fun error(code: String, message: String?, details: Any?) {
+            Log.e("ShareActivity", "Failed: $code - $message")
+            Toast.makeText(this@ShareActivity, "Failed to process link", Toast.LENGTH_SHORT).show()
+            finishSafely()
+        }
+        
+        override fun notImplemented() {
+            Log.e("ShareActivity", "Not implemented")
+            finishSafely()
         }
     }
     
@@ -134,100 +127,69 @@ class ShareActivity : Activity() {
         clipboard.setPrimaryClip(clip)
     }
 
-    private fun startBackgroundEngine(sharedText: String) {
-        if (backgroundEngine == null) {
-            val callbackHandle = applicationContext.getSharedPreferences("linksoap_prefs", android.content.Context.MODE_PRIVATE)
-                .getLong("share_callback_handle", 0)
-            
-            if (callbackHandle == 0L) {
-                Log.w("ShareActivity", "No callback handle found. Launching main app to register it.")
-                Toast.makeText(this, "Opening LinkSoap to set up share functionality...", Toast.LENGTH_LONG).show()
-                
-                // Launch MainActivity to register the callback handle
-                val mainIntent = Intent(this, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    putExtra("shared_text", sharedText)
-                }
-                startActivity(mainIntent)
-                finishSafely()
-                return
-            }
-            
-            val flutterLoader = FlutterInjector.instance().flutterLoader()
-            
-            if (!flutterLoader.initialized()) {
-                flutterLoader.startInitialization(applicationContext)
-            }
-            
-            Handler(Looper.getMainLooper()).post {
-                flutterLoader.ensureInitializationComplete(applicationContext, null)
-                
-                val callbackInfo = FlutterCallbackInformation.lookupCallbackInformation(callbackHandle)
-                
-                if (callbackInfo == null) {
-                    Log.e("ShareActivity", "Failed to lookup callback info for handle $callbackHandle")
-                    Toast.makeText(this@ShareActivity, "Failed to initialize link processing", Toast.LENGTH_SHORT).show()
-                    finishSafely()
-                    return@post
-                }
-                
-                backgroundEngine = FlutterEngine(applicationContext)
-                
-                val dartCallback = DartExecutor.DartCallback(
-                    applicationContext.assets,
-                    flutterLoader.findAppBundlePath(),
-                    callbackInfo
-                )
-                
-                backgroundEngine!!.dartExecutor.executeDartCallback(dartCallback)
-                
-                // Wait for initialization, then invoke method
-                Handler(Looper.getMainLooper()).postDelayed({
-                    invokeMethodOnBackgroundEngine(sharedText)
-                }, 500)
-            }
-        } else {
-            // Reuse existing background engine
-            invokeMethodOnBackgroundEngine(sharedText)
-        }
-    }
-    
-    private fun invokeMethodOnBackgroundEngine(sharedText: String) {
-        if (backgroundEngine == null) {
-            Log.e("ShareActivity", "Background engine is null")
-            finishSafely()
+    private fun startBackgroundEngine(text: String) {
+        backgroundEngine?.let {
+            invokeMethod(it, text)
             return
         }
         
-        try {
-            val channel = MethodChannel(
-                backgroundEngine!!.dartExecutor.binaryMessenger,
-                "net.clynamic.linksoap/share"
-            )
-            channel.invokeMethod("processSharedText", sharedText, object : MethodChannel.Result {
-                override fun success(result: Any?) {
-                    val cleanedText = result as? String
-                    if (cleanedText != null) {
-                        setClipboard(cleanedText)
-                    }
-                    finishSafely()
-                }
-                
-                override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
-                    Log.e("ShareActivity", "Share processing failed: $errorCode - $errorMessage")
-                    Toast.makeText(this@ShareActivity, "Failed to process link", Toast.LENGTH_SHORT).show()
-                    finishSafely()
-                }
-                
-                override fun notImplemented() {
-                    Log.e("ShareActivity", "Share processing not implemented")
-                    finishSafely()
-                }
-            })
-        } catch (e: Exception) {
-            Log.e("ShareActivity", "Exception invoking method: ${e.message}", e)
-            Toast.makeText(this, "Error processing link", Toast.LENGTH_SHORT).show()
-            finishSafely()
+        val handle = getSharedPreferences(ShareConstants.PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(ShareConstants.CALLBACK_HANDLE_KEY, 0)
+        
+        if (handle == 0L) {
+            launchMainActivity(text)
+            return
+        }
+        
+        val loader = FlutterInjector.instance().flutterLoader()
+        if (!loader.initialized()) {
+            loader.startInitialization(applicationContext)
+        }
+        
+        Handler(Looper.getMainLooper()).post {
+            loader.ensureInitializationComplete(applicationContext, null)
+            
+            val callbackInfo = FlutterCallbackInformation.lookupCallbackInformation(handle) ?: run {
+                Log.e("ShareActivity", "Failed to lookup callback")
+                Toast.makeText(this, "Failed to initialize", Toast.LENGTH_SHORT).show()
+                finishSafely()
+                return@post
+            }
+            
+            backgroundEngine = FlutterEngine(applicationContext).apply {
+                dartExecutor.executeDartCallback(
+                    DartExecutor.DartCallback(
+                        applicationContext.assets,
+                        loader.findAppBundlePath(),
+                        callbackInfo
+                    )
+                )
+            }
+            
+            Handler(Looper.getMainLooper()).postDelayed({
+                backgroundEngine?.let { invokeMethod(it, text) }
+            }, ShareConstants.INIT_DELAY_MS)
         }
     }
+    
+    private fun launchMainActivity(text: String) {
+        Log.w("ShareActivity", "No callback handle found. Launching main app.")
+        
+        startActivity(Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(ShareConstants.EXTRA_SETUP_BOOT, true)
+        })
+        
+        // Wait for MainActivity to cache the engine, then use it
+        Handler(Looper.getMainLooper()).postDelayed({
+            val engine = FlutterEngineCache.getInstance().get(ShareConstants.ENGINE_ID)
+            if (engine != null) {
+                invokeMethod(engine, text)
+            } else {
+                Log.e("ShareActivity", "Engine still not available after launching MainActivity")
+                finishSafely()
+            }
+        }, 2000) // Wait 2 seconds for MainActivity to start
+    }
+
 }
