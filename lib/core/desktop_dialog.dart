@@ -40,19 +40,18 @@ class DesktopDialog extends StatelessWidget {
           return child;
         }
 
-        return Center(
-          child: Container(
-            constraints: BoxConstraints(
-              maxWidth: maxWidth,
-            ),
-            margin: const EdgeInsets.all(48),
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: child,
+        return SafeArea(
+          minimum: const EdgeInsets.all(48),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: maxWidth,
+              ),
+              child: Material(
+                clipBehavior: Clip.antiAlias,
+                borderRadius: BorderRadius.circular(12),
+                child: child,
+              ),
             ),
           ),
         );
